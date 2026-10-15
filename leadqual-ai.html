@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LeadQual AI – B2B enquiry qualification (student prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff;--panel:#f5f7fb;--ink:#17202f;--muted:#5a6a82;--line:#e1e7f0;
+  --navy:#14284b;--navy2:#1f3a6e;--on-navy:#ffffff;
+  --green:#23915f;--green-soft:#e4f4ec;--green-ink:#17694436;
+  --warn:#9a6212;--warn-soft:#fdf1d8;--bad:#a93229;--bad-soft:#fbe8e6;--info-soft:#e8eefb;
+  --shadow:0 1px 2px rgba(20,40,75,.06),0 4px 14px rgba(20,40,75,.05);
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1626;--panel:#142038;--ink:#e8edf6;--muted:#9fb0c9;--line:#26354f;
+    --navy:#0b1730;--navy2:#3e63b0;--on-navy:#ffffff;
+    --green:#4cc28c;--green-soft:#123a2b;--warn:#f0b955;--warn-soft:#3a2d12;--bad:#ff8b80;--bad-soft:#3d1a18;--info-soft:#172a4d;
+    --shadow:none;color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1626;--panel:#142038;--ink:#e8edf6;--muted:#9fb0c9;--line:#26354f;
+  --navy:#0b1730;--navy2:#3e63b0;--on-navy:#ffffff;
+  --green:#4cc28c;--green-soft:#123a2b;--warn:#f0b955;--warn-soft:#3a2d12;--bad:#ff8b80;--bad-soft:#3d1a18;--info-soft:#172a4d;
+  --shadow:none;color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:15px;line-height:1.5;font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{margin:0;line-height:1.25;color:var(--ink)}
+h1{font-size:1.6rem;font-weight:700;letter-spacing:-.01em}
+h2{font-size:1.1rem;font-weight:650}
+h3{font-size:.98rem;font-weight:650}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:.85rem}
+header.top{background:var(--navy);color:var(--on-navy);position:sticky;top:env(safe-area-inset-top,0px);z-index:20}
+.top-in{max-width:1240px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.1rem;letter-spacing:-.01em}
+.brand .mark{width:30px;height:30px;border-radius:8px;background:var(--green);display:grid;place-items:center}
+.brand small{display:block;font-weight:400;font-size:.72rem;opacity:.75;margin-top:-2px}
+nav.tabs{display:flex;gap:2px;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{background:none;border:0;color:#cdd8ee;padding:9px 13px;border-radius:8px;cursor:pointer;white-space:nowrap;font-weight:500}
+nav.tabs button:hover{background:rgba(255,255,255,.1);color:#fff}
+nav.tabs button[aria-current="page"]{background:rgba(255,255,255,.16);color:#fff;box-shadow:inset 0 -2px 0 var(--green)}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.banner{background:var(--info-soft);border-bottom:1px solid var(--line);font-size:.85rem}
+.banner div{max-width:1240px;margin:0 auto;padding:8px 20px;color:var(--ink)}
+main{max-width:1240px;margin:0 auto;padding:24px 20px 60px}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.page-head p{color:var(--muted);margin-top:4px;max-width:68ch}
+.card{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:18px;box-shadow:var(--shadow)}
+.card + .card{margin-top:16px}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin-bottom:16px}
+.kpi{padding:14px 16px}
+.kpi .l{color:var(--muted);font-size:.82rem}
+.kpi .v{font-size:1.75rem;font-weight:700;color:var(--navy);margin:2px 0}
+:root[data-theme="dark"] .kpi .v{color:#fff}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .kpi .v{color:#fff}}
+.kpi .s{font-size:.8rem;color:var(--muted)}
+.kpi.good{border-left:4px solid var(--green)}
+.kpi.warn{border-left:4px solid #d9a441}
+.kpi.navy{border-left:4px solid var(--navy2)}
+.two{grid-template-columns:minmax(0,3fr) minmax(0,2fr)}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--bg);padding:9px 14px;border-radius:9px;cursor:pointer;font-weight:550}
+.btn:hover{background:var(--panel)}
+.btn.primary{background:var(--navy2);border-color:var(--navy2);color:#fff}
+.btn.primary:hover{filter:brightness(1.1)}
+.btn.green{background:var(--green);border-color:var(--green);color:#fff}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.sm{padding:5px 10px;font-size:.84rem;border-radius:8px}
+.btn[disabled]{opacity:.55;cursor:wait}
+.chip{display:inline-block;padding:2px 9px;border-radius:99px;font-size:.78rem;font-weight:600;white-space:nowrap;background:var(--panel);color:var(--ink);border:1px solid var(--line)}
+.chip.ok{background:var(--green-soft);color:var(--green);border-color:transparent}
+.chip.warn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.chip.bad{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.chip.info{background:var(--info-soft);color:var(--navy2);border-color:transparent}
+:root[data-theme="dark"] .chip.info{color:#a9c2f5}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .chip.info{color:#a9c2f5}}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+table.tbl{width:100%;border-collapse:collapse;font-size:.9rem}
+.tbl th{text-align:left;font-weight:600;color:var(--muted);background:var(--panel);padding:10px 12px;white-space:nowrap;border-bottom:1px solid var(--line)}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr.row{cursor:pointer}
+.tbl tbody tr.row:hover{background:var(--panel)}
+.tbl .idbtn{background:none;border:0;padding:0;color:var(--navy2);font-weight:650;cursor:pointer;text-decoration:underline}
+:root[data-theme="dark"] .tbl .idbtn{color:#a9c2f5}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tbl .idbtn{color:#a9c2f5}}
+.clip{max-width:260px}
+.chips{display:flex;gap:4px;flex-wrap:wrap}
+form .row2{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+form .row3{display:grid;gap:14px;grid-template-columns:2fr 1fr 1fr}
+@media(max-width:640px){form .row2,form .row3{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.field label,.lab{font-weight:600;font-size:.88rem}
+.field .hint{font-size:.78rem;color:var(--muted)}
+input[type=text],input[type=number],input[type=email],input[type=tel],select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--bg)}
+textarea{min-height:110px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--green);outline-offset:0;border-color:var(--green)}
+.req{color:var(--bad)}
+.examples{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.chart{display:flex;flex-direction:column;gap:12px}
+.bar-row{display:grid;grid-template-columns:minmax(110px,170px) 1fr 28px;gap:10px;align-items:center;font-size:.85rem}
+.bar{display:flex;height:20px;border-radius:6px;overflow:hidden;background:var(--panel)}
+.bar i{display:block;height:100%}
+.seg-q{background:var(--green)}.seg-n{background:#e0a93a}.seg-i{background:#c4504a}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-top:12px}
+.legend b{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.conf{display:inline-block;width:70px;height:7px;border-radius:5px;background:var(--panel);border:1px solid var(--line);vertical-align:middle;overflow:hidden}
+.conf i{display:block;height:100%;background:var(--green)}
+.conf.mid i{background:#d9a441}.conf.low i{background:#c4504a}
+.status-banner{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:12px;margin-bottom:16px}
+.status-banner.ok{background:var(--green-soft)}.status-banner.warn{background:var(--warn-soft)}.status-banner.bad{background:var(--bad-soft)}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;font-size:.9rem}
+@media(max-width:520px){.kv{grid-template-columns:1fr}}
+.kv dt{color:var(--muted)}.kv dd{margin:0}
+.q{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:var(--bg)}
+.q .why{font-size:.84rem;color:var(--muted);margin-top:3px}
+.match{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.match:last-child{border-bottom:0}
+pre.json{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;overflow:auto;font-size:.8rem;max-height:420px;font-family:ui-monospace,Menlo,Consolas,monospace}
+details summary{cursor:pointer;font-weight:600}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.toolbar input[type=text]{flex:1 1 220px;min-width:0}
+.toolbar select{flex:0 1 190px;min-width:0}
+.empty{text-align:center;padding:36px 16px;color:var(--muted)}
+.empty h3{color:var(--ink);margin-bottom:4px}
+.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spin{animation-duration:2s}}
+.overlay{position:fixed;inset:0;background:rgba(10,20,40,.45);z-index:40;display:flex;justify-content:flex-end}
+.drawer{width:min(560px,100%);height:100%;background:var(--bg);overflow-y:auto;padding:20px;padding-top:calc(20px + env(safe-area-inset-top,0px));padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));border-left:1px solid var(--line)}
+.drawer .dh{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:12px}
+.modal-wrap{position:fixed;inset:0;background:rgba(10,20,40,.5);z-index:50;display:grid;place-items:center;padding:16px}
+.modal{background:var(--bg);border-radius:14px;padding:20px;max-width:480px;width:100%;border:1px solid var(--line)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:#fff;padding:11px 18px;border-radius:10px;z-index:60;box-shadow:0 6px 24px rgba(0,0,0,.25);max-width:90vw}
+.toast.err{background:var(--bad);color:#fff}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{padding:0 0 12px 18px;border-left:2px solid var(--line);position:relative;font-size:.86rem}
+.tl li::before{content:"";position:absolute;left:-6px;top:3px;width:10px;height:10px;border-radius:50%;background:var(--green)}
+.statusbtns{display:flex;gap:6px;flex-wrap:wrap}
+.statusbtns .btn[aria-pressed="true"]{background:var(--navy2);color:#fff;border-color:var(--navy2)}
+.cmp td:nth-child(2){color:var(--muted)}
+.diff{background:var(--green-soft)}
+.note{font-size:.84rem;color:var(--muted)}
+.sec{margin-bottom:22px}
+.sec > h2{margin-bottom:10px}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px}
+.stat{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--bg)}
+.stat b{display:block;font-size:1.7rem;line-height:1.1}.stat span{font-size:.82rem;color:var(--muted)}
+.stat.g{border-left:4px solid var(--green)}.stat.w{border-left:4px solid #d9a441}
+.todo{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.todo:last-child{border-bottom:0}
+.todo > div:last-child{display:flex;gap:8px;align-items:center;flex-shrink:0}
+@media(max-width:560px){.todo{flex-direction:column;align-items:flex-start}}
+.narrow{max-width:720px}
+.btn.big{padding:12px 22px;font-size:1rem}
+.more{margin:4px 0 8px}.more summary{color:var(--navy2);font-weight:600}
+.linkbtn{background:none;border:0;padding:0;color:var(--navy2);cursor:pointer;text-decoration:underline;font:inherit}
+:root[data-theme="dark"] .linkbtn{color:#a9c2f5}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .linkbtn{color:#a9c2f5}}
+.tabs2{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;border-bottom:1px solid var(--line)}
+.tabs2 button{background:none;border:0;padding:9px 12px;cursor:pointer;color:var(--muted);font-weight:550;white-space:nowrap;border-bottom:3px solid transparent}
+.tabs2 button span{background:var(--panel);border-radius:99px;padding:0 7px;font-size:.78rem;margin-left:3px}
+.tabs2 button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--green)}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;margin-bottom:6px}
+@media(max-width:560px){.fgrid{grid-template-columns:1fr}}
+.field .hint{margin-top:-1px}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <div class="brand">
+    <span class="mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></span>
+    <span>LeadQual AI<small>Enquiry verification and qualification</small></span>
+  </div>
+  <nav class="tabs" id="nav" aria-label="Screens"></nav>
+</div></header>
+<main id="app" tabindex="-1"></main>
+<div id="overlay"></div><div id="modal"></div><div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+/* ================= config & helpers ================= */
+const KEY='leadqual_ai_demo_v1';
+const AI_ENDPOINT=''; // Set to a server-side function URL that returns the same JSON schema. Empty = rule-based demo mode. Never put API keys in this file.
+const STATUSES=['New','Awaiting clarification','Ready for review','Accepted','Quotation sent','Converted','Rejected'];
+const REJECT_REASONS=['Wrong product','Insufficient quantity','Location mismatch','Budget mismatch','Other'];
+const FIELDS=['product','quantity','unit','location','timeline','specs','use_case','budget'];
+const REQUIRED=['product','quantity','unit','location','timeline','specs','use_case'];
+const LABEL={product:'Product / service',quantity:'Quantity',unit:'Unit',location:'Delivery location',timeline:'Purchase timeline',specs:'Specifications',use_case:'Business use case',budget:'Budget (optional)'};
+const $=(s,r)=>(r||document).querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clean=(t,max)=>String(t==null?'':t).replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,max||500);
+const num=s=>parseFloat(String(s).replace(/,/g,''));
+const title=s=>s.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+const fmtDate=t=>new Date(t).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+const fmtDT=t=>new Date(t).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+const pct=(a,b)=>b?Math.round(a/b*100):0;
+
+/* ================= taxonomy & sample supplier catalogue ================= */
+const CATS=[
+ {id:'crushing',label:'Crushing & screening',kw:['jaw crusher','cone crusher','impact crusher','vsi','crusher','vibrating screen','screening plant','aggregate plant'],spec:'What capacity (TPH), feed material and final product size do you need?'},
+ {id:'conveyor',label:'Conveyors & handling',kw:['belt conveyor','conveyor','idler','hopper','feeder'],spec:'What belt width, length, material and capacity are needed?'},
+ {id:'cnc',label:'CNC & machine tools',kw:['cnc','vmc','hmc','lathe','milling','machining centre'],spec:'How many axes, what table or bed size, and which materials will you machine?'},
+ {id:'pumps',label:'Pumps & motors',kw:['centrifugal pump','submersible','pump','motor'],spec:'What flow rate, head, fluid and power rating are required?'},
+ {id:'solar',label:'Solar equipment',kw:['solar panel','solar inverter','solar','inverter','pv'],spec:'What capacity (kW) and type, and is it rooftop or ground mounted?'},
+ {id:'steel',label:'Steel & metals',kw:['tmt','rebar','steel pipe','ms pipe','erw','steel','gi sheet','pipe'],spec:'Which grade, size or thickness and standard do you need?'},
+ {id:'packaging',label:'Packaging',kw:['corrugated','carton','packaging','pouch','boxes','box'],spec:'What dimensions, ply or material, and printing are required?'},
+ {id:'textile',label:'Textiles & yarn',kw:['fabric','yarn','cotton','textile','polyester'],spec:'What count or GSM, composition and width do you need?'}
+];
+const GENERIC=['machine','machinery','equipment','material','product','item','goods','parts','steel','pump','motor','box','fabric','pipe','crusher','screen','conveyor','solar','inverter'];
+const SUPPLIERS=[
+ {id:'S01',name:'Shakti Crushers & Screens',cat:'crushing',terms:['jaw','cone','vibrating','crusher','screen'],states:['Rajasthan','Gujarat','Madhya Pradesh'],moq:[1,'units']},
+ {id:'S02',name:'Deccan Aggregate Machinery',cat:'crushing',terms:['jaw','impact','vsi','aggregate'],states:['Karnataka','Telangana','Tamil Nadu','Maharashtra'],moq:[1,'units']},
+ {id:'S03',name:'Himalaya Crusher Plants',cat:'crushing',terms:['jaw','cone','crusher','screen'],states:['Punjab','Uttar Pradesh','Delhi','Haryana'],moq:[1,'units']},
+ {id:'S04',name:'Nirmal Conveyors India',cat:'conveyor',terms:['belt','conveyor','idler'],states:['*'],moq:[50,'meters']},
+ {id:'S05',name:'Vega Material Handling',cat:'conveyor',terms:['conveyor','hopper','feeder'],states:['Maharashtra','Karnataka','Chhattisgarh'],moq:[1,'units']},
+ {id:'S06',name:'Precision Axis CNC Works',cat:'cnc',terms:['cnc','vmc','lathe','milling'],states:['Gujarat','Maharashtra','Tamil Nadu'],moq:[1,'units']},
+ {id:'S07',name:'AquaFlow Pumps & Motors',cat:'pumps',terms:['pump','centrifugal','submersible','motor'],states:['*'],moq:[1,'units']},
+ {id:'S08',name:'SunGrid Renewables',cat:'solar',terms:['solar','panel','inverter'],states:['Gujarat','Maharashtra','Rajasthan','Karnataka'],moq:[1,'units']},
+ {id:'S09',name:'Bharat TMT & Alloys',cat:'steel',terms:['tmt','rebar','steel','pipe'],states:['*'],moq:[5,'tons']},
+ {id:'S10',name:'Coastal Steel Traders',cat:'steel',terms:['pipe','steel','erw','tmt'],states:['Tamil Nadu','Kerala','Karnataka'],moq:[2,'tons']},
+ {id:'S11',name:'PackRight Corrugation',cat:'packaging',terms:['corrugated','box','carton'],states:['Maharashtra','Gujarat','Karnataka'],moq:[500,'pieces']},
+ {id:'S12',name:'Surat Weave Textiles',cat:'textile',terms:['fabric','cotton','yarn'],states:['Gujarat','Maharashtra','Rajasthan'],moq:[500,'meters']}
+];
+const CITY_STATE={Mumbai:'Maharashtra',Pune:'Maharashtra',Nagpur:'Maharashtra',Delhi:'Delhi',Bengaluru:'Karnataka',Chennai:'Tamil Nadu',Coimbatore:'Tamil Nadu',Hyderabad:'Telangana',Ahmedabad:'Gujarat',Surat:'Gujarat',Rajkot:'Gujarat',Vadodara:'Gujarat',Kolkata:'West Bengal',Jaipur:'Rajasthan',Indore:'Madhya Pradesh',Bhopal:'Madhya Pradesh',Lucknow:'Uttar Pradesh',Ludhiana:'Punjab',Kochi:'Kerala',Raipur:'Chhattisgarh',Maharashtra:'Maharashtra',Gujarat:'Gujarat',Rajasthan:'Rajasthan',Karnataka:'Karnataka','Tamil Nadu':'Tamil Nadu',Telangana:'Telangana','Uttar Pradesh':'Uttar Pradesh',Punjab:'Punjab',Kerala:'Kerala',Odisha:'Odisha',Chhattisgarh:'Chhattisgarh','Madhya Pradesh':'Madhya Pradesh',Haryana:'Haryana'};
+const LOC_LIST=Object.keys(CITY_STATE).concat(['Bangalore']).sort((a,b)=>b.length-a.length);
+function normLoc(t){const s=String(t||'').toLowerCase();for(const l of LOC_LIST){if(new RegExp('\\b'+l.toLowerCase()+'\\b').test(s))return l==='Bangalore'?'Bengaluru':l;}return null;}
+const stateOf=l=>CITY_STATE[l]||null;
+
+/* ================= unit & text parsing (rule-based) ================= */
+const UNITMAP={unit:'units',units:'units',no:'units',nos:'units',pcs:'pieces',piece:'pieces',pieces:'pieces',set:'sets',sets:'sets',ton:'tons',tons:'tons',tonne:'tons',tonnes:'tons',mt:'tons',kg:'kg',kgs:'kg',kilogram:'kg',kilograms:'kg',metre:'meters',metres:'meters',meter:'meters',meters:'meters',roll:'rolls',rolls:'rolls',box:'boxes',boxes:'boxes',carton:'cartons',cartons:'cartons',litre:'litres',litres:'litres',liter:'litres',liters:'litres',panel:'panels',panels:'panels',machine:'units',machines:'units',pump:'units',pumps:'units',light:'units',lights:'units'};
+const UNIT_OPTS=['units','pieces','sets','tons','kg','meters','rolls','boxes','cartons','litres','panels'];
+const COUNT=['units','pieces','sets','panels'];
+const canon=u=>UNITMAP[String(u||'').toLowerCase().replace(/[.\s]/g,'')]||null;
+const UNIT_SRC='(units?|nos\\.?|pcs|pieces?|sets?|tons?|tonnes?|mt|kgs?|kilograms?|metres?|meters?|rolls?|boxes|cartons?|litres?|liters?|panels?|machines?|pumps?|lights?)\\b';
+const QTY_RE=new RegExp('(\\d[\\d,]*(?:\\.\\d+)?)\\s*'+UNIT_SRC,'i');
+const QTY_VERB=/\b(?:need|require|want|looking for|buy|order|purchase|quantity|qty)\s*:?\s*(?:about |around |approx\.? )?(\d[\d,]*)\b(?!\s*(?:tph|kw|hp|mm|cm|inch|kva|mw|wp|gsm|ply|phase|axis|x\b|s\b|%))/i;
+const SPEC_A=/\b\d+(?:\.\d+)?\s?(?:tph|kw|kva|mw|hp|mm|cm|inch|bar|mpa|rpm|gsm|ply|phase|axis|wp)\b/gi;
+const SPEC_B=/\b\d+\s?x\s?\d+(?:\s?x\s?\d+)?\s?(?:mm|cm|inch|in|ft)?\b/gi;
+const SPEC_C=/\b(?:ss\s?3\d\d|fe\s?\d{3}d?|mild steel|stainless steel|hdpe|pvc|cast iron|manganese|aluminium|aluminum|polyester|mono\s?perc|bifacial|on-grid|off-grid|erw|\d+s cotton)\b/gi;
+function parseTimeline(t){
+  const s=String(t||'').toLowerCase();let m;
+  if(/\b(urgent(?:ly)?|asap|immediately|right away)\b/.test(s))return 'Immediate (urgent)';
+  if((m=s.match(/\bwithin\s+(\d+)\s*(day|week|month)s?/)))return 'Within '+m[1]+' '+m[2]+(m[1]==='1'?'':'s');
+  if((m=s.match(/\bin\s+(\d+)\s*(day|week|month)s?\b/)))return 'In '+m[1]+' '+m[2]+(m[1]==='1'?'':'s');
+  if((m=s.match(/\b(this|next)\s+(week|month|quarter)\b/)))return title(m[1]+' '+m[2]);
+  if((m=s.match(/\bby\s+((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*(?:\s+\d{4})?)/)))return 'By '+title(m[1]);
+  return null;
+}
+function parseBudget(t){
+  const s=String(t||'');
+  const m=s.match(/(?:₹|rs\.?|inr)\s*([\d,]+(?:\.\d+)?)\s*(lakhs?|lacs?|crores?|cr|k)?/i)||s.match(/budget(?:\s*(?:of|is))?\s*:?\s*([\d,.]+)\s*(lakhs?|lacs?|crores?|cr|k)?/i);
+  if(!m)return null;
+  const u=(m[2]||'').toLowerCase();const unit=/^la/.test(u)?' lakh':/^cr/.test(u)?' crore':u==='k'?'k':'';
+  return '₹'+m[1]+unit;
+}
+function parseText(text){
+  const t=clean(text,2000),out={};let m;
+  if((m=t.match(QTY_RE))){out.qty=num(m[1]);out.unit=canon(m[2]);}
+  else if((m=t.match(QTY_VERB))){out.qty=num(m[1]);}
+  out.location=normLoc(t);
+  out.timeline=parseTimeline(t);
+  out.budget=parseBudget(t);
+  const sp=[];[SPEC_A,SPEC_B,SPEC_C].forEach(r=>{(t.match(r)||[]).forEach(x=>{const v=x.trim();if(!sp.some(y=>y.toLowerCase()===v.toLowerCase()))sp.push(v);});});
+  out.specs=sp.length?sp.join(', '):null;
+  const u=t.match(/(?:\bfor\s+(?:our\s+|my\s+|a\s+|an\s+|the\s+)?|to be used (?:in|for)\s+(?:our\s+|my\s+|a\s+|an\s+|the\s+)?|use case:?\s*)([a-z][a-z \-&\/]{4,60}?)(?=[.,;\n]|\s+(?:in|at|with|within|by|need|delivered|located)\b|$)/i);
+  out.use_case=(u&&!/^(delivery|price|quote|quotation|best|urgent|the best|a quote)/i.test(u[1]))?clean(u[1],80):null;
+  return out;
+}
+function inferCategory(text){
+  const s=String(text||'').toLowerCase();let best=null;
+  CATS.forEach(c=>{let score=0,kw=null;c.kw.forEach(k=>{if(new RegExp('\\b'+k+'s?\\b').test(s)){score+=k.length;if(!kw||k.length>kw.length)kw=k;}});if(score&&(!best||score>best.score))best={id:c.id,score,kw};});
+  return best;
+}
+const catLabel=id=>(CATS.find(c=>c.id===id)||{label:'Uncategorised'}).label;
+const INJECTION=/ignore (all |any )?(previous|prior|above)|system prompt|you are now|disregard (the )?(rules|instructions)|reveal .{0,20}(key|prompt)|<\s*script/i;
+
+/* ================= extraction + qualification engine ================= */
+const CONF={form:0.95,text:0.8,answer:0.92,edited:1,none:0};
+function setExt(enq,f,v,src){const empty=v==null||v==='';enq.ext[f]={value:empty?null:v,confidence:empty?0:CONF[src],source:empty?'none':src};}
+function sanitizeRaw(r){
+  const consent=!!r.consent;
+  return {product:clean(r.product,120),text:clean(r.text,2000),qty:r.qty===''||r.qty==null?'':num(r.qty),unit:clean(r.unit,20),budget:clean(r.budget,60),location:clean(r.location,80),timeline:clean(r.timeline,60),useCase:clean(r.useCase,120),consent,contact:consent?{name:clean(r.contact&&r.contact.name,80),phone:clean(r.contact&&r.contact.phone,20),email:clean(r.contact&&r.contact.email,100)}:null};
+}
+function extract(raw){
+  const enq={ext:{}},tx=parseText(raw.text);
+  const catAll=inferCategory(raw.product+' '+raw.text);
+  let product=raw.product,psrc='form';
+  if(!product&&catAll&&catAll.kw){product=title(catAll.kw);psrc='text';}
+  else if(product&&GENERIC.includes(product.toLowerCase())&&catAll&&catAll.kw&&catAll.kw.length>product.length&&catAll.kw.indexOf(product.toLowerCase())>-1){product=title(catAll.kw);psrc='text';}
+  setExt(enq,'product',product,psrc);
+  const hasQ=raw.qty!==''&&!isNaN(raw.qty)&&raw.qty>0;
+  setExt(enq,'quantity',hasQ?raw.qty:tx.qty,hasQ?'form':'text');
+  const fu=canon(raw.unit);setExt(enq,'unit',fu||tx.unit,fu?'form':'text');
+  setExt(enq,'location',normLoc(raw.location)||raw.location||tx.location,raw.location?'form':'text');
+  setExt(enq,'timeline',raw.timeline||tx.timeline,raw.timeline?'form':'text');
+  setExt(enq,'specs',tx.specs,'text');
+  setExt(enq,'use_case',raw.useCase||tx.use_case,raw.useCase?'form':'text');
+  if(enq.ext.use_case.source==='text')enq.ext.use_case.confidence=0.55;
+  if(enq.ext.specs.source==='text')enq.ext.specs.confidence=0.65;
+  if(enq.ext.timeline.source==='text')enq.ext.timeline.confidence=0.7;
+  setExt(enq,'budget',raw.budget||tx.budget,raw.budget?'form':'text');
+  return enq.ext;
+}
+function detectMismatches(raw){
+  const tx=parseText(raw.text),out=[];
+  const hasQ=raw.qty!==''&&!isNaN(raw.qty)&&raw.qty>0;
+  if(hasQ&&tx.qty&&tx.qty!==raw.qty)out.push({field:'quantity',form_value:String(raw.qty),text_value:String(tx.qty),message:'Form quantity ('+raw.qty+') differs from the description ('+tx.qty+').'});
+  const fu=canon(raw.unit);
+  if(fu&&tx.unit&&fu!==tx.unit&&!(COUNT.includes(fu)&&COUNT.includes(tx.unit)))out.push({field:'unit',form_value:fu,text_value:tx.unit,message:'Form unit ('+fu+') differs from the description ('+tx.unit+').'});
+  const fl=normLoc(raw.location);
+  if(fl&&tx.location&&fl!==tx.location)out.push({field:'location',form_value:fl,text_value:tx.location,message:'Delivery location in the form ('+fl+') differs from the description ('+tx.location+').'});
+  const c1=inferCategory(raw.product),c2=inferCategory(raw.text);
+  if(c1&&c2&&c1.id!==c2.id)out.push({field:'product',form_value:raw.product,text_value:title(c2.kw),message:'Product field suggests '+catLabel(c1.id)+' but the description mentions '+catLabel(c2.id)+'.'});
+  return out;
+}
+const QDEF={
+ product:['What product or service do you need?','Sellers are matched by product, so enquiries without one cannot be routed.'],
+ quantity:['How many (or how much) do you need?','Sellers need a quantity to check minimum order sizes and to quote.'],
+ unit:['In which unit is the quantity (for example units, tons, meters)?','A number without a unit can mean very different orders and prices.'],
+ location:['Which city or state should this be delivered to?','Freight, lead time and serviceability depend on location, and many sellers serve only certain regions.'],
+ timeline:['When do you need it by?','Urgency decides whether a seller with stock or a shorter lead time is the right fit.'],
+ use_case:['What will you use it for?','Knowing the use lets a seller recommend the right model or grade instead of only the cheapest one.']
+};
+function buildQuestions(missing,mism,cat){
+  const qs=[];
+  mism.forEach(m=>qs.push({id:m.field+':mismatch',field:m.field,kind:'mismatch',question:m.message+' Which one is correct?',why:'Conflicting details lead sellers to quote the wrong item or quantity.',options:[m.form_value,m.text_value]}));
+  const order=['product','quantity','unit','specs','location','timeline','use_case'];
+  order.forEach(f=>{
+    if(!missing.some(x=>x.field===f))return;
+    if(f==='specs'){const c=CATS.find(x=>x.id===cat);qs.push({id:'specs:missing',field:'specs',kind:'missing',question:c?c.spec:'Which specifications matter most (size, capacity, material, standard)?',why:'Specifications are what separate a relevant quote from a generic one.'});}
+    else qs.push({id:f+':missing',field:f,kind:'missing',question:QDEF[f][0],why:QDEF[f][1]});
+  });
+  return qs.slice(0,3);
+}
+function matchSuppliers(enq){
+  const e=enq.ext,cat=categoryOf(enq);if(!cat)return[];
+  const ptxt=((e.product.value||'')+' '+enq.raw.text).toLowerCase(),loc=e.location.value,st=stateOf(loc);
+  const qty=e.quantity.value,unit=e.unit.value;
+  return SUPPLIERS.filter(s=>s.cat===cat).map(s=>{
+    let score=50;const why=['Category match: '+catLabel(cat)+' (+50)'];
+    const hits=s.terms.filter(t=>ptxt.indexOf(t)>-1);
+    if(hits.length){score+=15;why.push('Product terms match: '+hits.slice(0,3).join(', ')+' (+15)');}else why.push('No specific product term match (+0)');
+    if(!st)why.push('Delivery location unknown, region not scored (+0)');
+    else if(s.states[0]==='*'){score+=20;why.push('Serves all India (+20)');}
+    else if(s.states.includes(st)){score+=20;why.push('Serves '+st+' (+20)');}
+    else why.push('Does not list '+st+' as a served region (+0)');
+    if(!qty||!unit)why.push('Quantity or unit unknown, minimum order not checked (+0)');
+    else if(s.moq[1]===unit||(COUNT.includes(unit)&&COUNT.includes(s.moq[1]))){if(qty>=s.moq[0]){score+=15;why.push('Meets minimum order of '+s.moq[0]+' '+s.moq[1]+' (+15)');}else why.push('Below minimum order of '+s.moq[0]+' '+s.moq[1]+' (+0)');}
+    else why.push('Minimum order is in '+s.moq[1]+', unit differs so it needs checking (+0)');
+    return {supplier_id:s.id,supplier:s.name,score,reasons:why};
+  }).sort((a,b)=>b.score-a.score).slice(0,3);
+}
+function categoryOf(enq){const c=inferCategory((enq.ext.product.value||'')+' '+enq.raw.text);return c?c.id:null;}
+function qualify(enq){
+  const e=enq.ext,missing=[],reasons=[];
+  REQUIRED.forEach(f=>{
+    const v=e[f].value;
+    if(v==null||v==='')missing.push({field:f,label:LABEL[f],reason:'Not provided'});
+    else if(f==='product'&&String(v).trim().split(/\s+/).length<=1&&GENERIC.includes(String(v).toLowerCase()))missing.push({field:f,label:LABEL[f],reason:'Too generic to match sellers'});
+  });
+  const mism=detectMismatches(enq.raw).filter(m=>!enq.confirmed.includes(m.field));
+  const cat=categoryOf(enq);
+  const prodBad=missing.some(m=>m.field==='product');
+  let status='qualified';
+  if(prodBad||missing.length>=4)status='insufficient_information';
+  else if(missing.length||mism.length)status='needs_clarification';
+  if(status==='qualified')reasons.push('All required details are present and the form agrees with the description.');
+  if(missing.length)reasons.push(missing.length+' required detail(s) missing or unclear: '+missing.map(m=>m.label.toLowerCase()).join(', ')+'.');
+  if(mism.length)reasons.push(mism.length+' mismatch(es) between the form and the free text.');
+  if(enq.flagged)reasons.push('The description contained instruction-like text. It was treated as plain data and ignored.');
+  reasons.push('Incomplete enquiries are never treated as suspicious; this status only reflects missing detail.');
+  const questions=buildQuestions(missing,mism,cat);
+  const next=status==='qualified'?'Send to matched sellers after a human review.':status==='needs_clarification'?'Ask the buyer up to three clarification questions, then re-check.':'Hold routing. Ask the buyer to describe what they need in more detail.';
+  const ex={};FIELDS.forEach(f=>ex[f]={value:e[f].value,confidence:e[f].confidence,source:e[f].source});
+  const r={engine_mode:AI_ENDPOINT?'llm':'rule_based_demo',extracted_requirements:ex,missing_fields:missing,clarification_questions:questions,detected_mismatches:mism,qualification_status:status,qualification_reasons:reasons,suggested_next_action:next,supplier_matches:matchSuppliers(enq),category:cat,seller_summary:sellerSummary(enq,missing,mism)};
+  const v=validateResult(r);if(!v.ok)throw new Error('Schema validation failed: '+v.errors.join('; '));
+  return r;
+}
+function sellerSummary(enq,missing,mism){
+  const e=enq.ext,p=[];
+  p.push((e.product.value||'Product not stated')+(e.quantity.value?' – '+e.quantity.value+(e.unit.value?' '+e.unit.value:''):''));
+  if(e.location.value)p.push('deliver to '+e.location.value);
+  if(e.timeline.value)p.push('timeline: '+e.timeline.value);
+  if(e.specs.value)p.push('specs: '+e.specs.value);
+  if(e.use_case.value)p.push('use: '+e.use_case.value);
+  if(e.budget.value)p.push('budget: '+e.budget.value);
+  let s=p.join('; ')+'.';
+  const open=missing.map(m=>m.label.toLowerCase()).concat(mism.map(m=>m.field+' mismatch'));
+  if(open.length)s+=' Open items: '+open.join(', ')+'.';
+  return s;
+}
+function validateResult(r){
+  const e=[];
+  if(!r||typeof r!=='object')return{ok:false,errors:['result is not an object']};
+  ['missing_fields','clarification_questions','detected_mismatches','qualification_reasons','supplier_matches'].forEach(k=>{if(!Array.isArray(r[k]))e.push(k+' must be an array');});
+  if(!r.extracted_requirements||typeof r.extracted_requirements!=='object')e.push('extracted_requirements must be an object');
+  if(!['qualified','needs_clarification','insufficient_information'].includes(r.qualification_status))e.push('qualification_status invalid');
+  if(typeof r.suggested_next_action!=='string')e.push('suggested_next_action must be a string');
+  if(Array.isArray(r.clarification_questions)){if(r.clarification_questions.length>3)e.push('at most 3 clarification questions');r.clarification_questions.forEach((q,i)=>{if(!q||!q.question||!q.why)e.push('question '+i+' needs question and why');});}
+  return{ok:!e.length,errors:e};
+}
+async function remoteQualify(enq){
+  const res=await fetch(AI_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enquiry:enq.raw})});
+  if(!res.ok)throw new Error('AI service returned '+res.status);
+  const j=await res.json();const v=validateResult(j);if(!v.ok)throw new Error('Invalid AI output: '+v.errors.join('; '));
+  j.engine_mode='llm';return j;
+}
+async function runEngine(enq){
+  if(AI_ENDPOINT){try{enq.result=await remoteQualify(enq);return;}catch(err){enq.result=qualify(enq);enq.result.engine_mode='rule_based_fallback';enq.result.fallback_reason=String(err.message||err);return;}}
+  enq.result=qualify(enq);
+}
+
+/* ================= state ================= */
+let state=null;
+function hist(enq,to,actor,note,at){enq.history.push({at:at||Date.now(),from:enq.status,to,actor,note:note||''});enq.status=to;}
+function snapshot(ext){const o={};FIELDS.forEach(f=>o[f]=ext[f].value==null?'':String(ext[f].value));return o;}
+function createEnquiry(rawIn,opts){
+  opts=opts||{};
+  const raw=sanitizeRaw(rawIn),id='ENQ-'+state.seq++,createdAt=opts.createdAt||Date.now();
+  const enq={id,createdAt,raw,confirmed:[],answers:[],corrections:[],history:[],status:'New',rejection:null,flagged:INJECTION.test(raw.text+' '+raw.product)};
+  enq.ext=extract(raw);enq.original=snapshot(enq.ext);
+  enq.aiExtracted=FIELDS.filter(f=>enq.ext[f].source==='text').length;
+  enq.result=qualify(enq);
+  enq.origResult={status:enq.result.qualification_status,missing:enq.result.missing_fields.length,mismatches:enq.result.detected_mismatches.length};
+  enq.hadQuestions=enq.result.clarification_questions.length>0;
+  hist(enq,'New','system','Enquiry received',createdAt);
+  if(!opts.keepNew)hist(enq,enq.result.qualification_status==='qualified'?'Ready for review':'Awaiting clarification','system','Qualification completed ('+enq.result.engine_mode.replace(/_/g,' ')+')',createdAt+60000);
+  state.enquiries.push(enq);
+  return enq;
+}
+function setField(enq,f,val,at){
+  let v=clean(val,200);
+  if(f==='quantity'){v=v===''?null:num(v);if(v!==null&&(isNaN(v)||v<=0))v=null;}
+  if(f==='unit'&&v)v=canon(v)||v.toLowerCase();
+  const prev=enq.ext[f].value,prevSrc=enq.ext[f].source;
+  if(String(prev==null?'':prev)===String(v==null?'':v))return false;
+  enq.corrections.push({field:f,from:prev,to:v,fromSource:prevSrc,at:at||Date.now()});
+  setExt(enq,f,v,'edited');if(!enq.confirmed.includes(f))enq.confirmed.push(f);
+  return true;
+}
+function applyAnswer(enq,q,val,at){
+  const f=q.field;let v=clean(val,200);if(!v)return false;
+  if(f==='quantity'){const m=v.match(/\d[\d,]*(?:\.\d+)?/);if(!m)return false;const um=v.match(new RegExp('\\b'+UNIT_SRC,'i'));if(um&&canon(um[0])&&!enq.ext.unit.value)setExt(enq,'unit',canon(um[0]),'answer');v=num(m[0]);}
+  else if(f==='unit'){v=canon(v.split(/\s+/)[0])||v.toLowerCase();}
+  else if(f==='location'){v=normLoc(v)||title(v);}
+  else if(f==='timeline'){v=parseTimeline(v)||v;}
+  setExt(enq,f,v,'answer');if(!enq.confirmed.includes(f))enq.confirmed.push(f);
+  enq.answers.push({qid:q.id,field:f,question:q.question,answer:String(v),at:at||Date.now()});
+  return true;
+}
+function afterChange(enq,at){
+  enq.result=qualify(enq);
+  if(enq.result.qualification_status==='qualified'&&['New','Awaiting clarification'].includes(enq.status))hist(enq,'Ready for review','system','All required details are now present',at);
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+function load(){try{const s=localStorage.getItem(KEY);if(s){const o=JSON.parse(s);if(o&&Array.isArray(o.enquiries))return o;}}catch(e){}return null;}
+
+/* ================= seed data (synthetic) ================= */
+function seed(){
+  state={seq:1001,enquiries:[]};
+  const H=3600e3,D=864e5,now=Date.now();
+  const S=[
+   {d:21,p:{product:'Jaw crusher',text:'Looking for a 200 TPH jaw crusher with manganese liners for a granite quarry. Need delivery within 6 weeks.',qty:2,unit:'units',budget:'₹45 lakh',location:'Jaipur',timeline:'Within 1 month',useCase:'Granite quarry primary crushing'},path:[['Accepted',3],['Quotation sent',20],['Converted',150]]},
+   {d:18,p:{product:'Conveyor belt',text:'Need 400 meters of 800 mm wide belt conveyor with idlers for a cement plant. Urgent.',qty:400,unit:'meters',budget:'',location:'Nagpur',timeline:'Immediate (within 1 week)',useCase:''},path:[['Accepted',5],['Quotation sent',30]],fix:[['specs','800 mm belt width, 4 ply']]},
+   {d:15,p:{product:'CNC machine',text:'We want to buy a VMC for machining aluminium parts. 3 axis, table 1000x500 mm.',qty:1,unit:'units',budget:'',location:'Pune',timeline:'1–3 months',useCase:'Auto component job work'},path:[['Accepted',8]]},
+   {d:14,p:{product:'Pump',text:'Need pumps',qty:'',unit:'',budget:'',location:'',timeline:'',useCase:''},path:[]},
+   {d:12,p:{product:'TMT bars',text:'Require Fe 550D TMT bars 12 mm and 16 mm, 30 tons for a residential project. Need by next month.',qty:30,unit:'tons',budget:'',location:'Hyderabad',timeline:'',useCase:''},path:[['Accepted',4],['Quotation sent',26]]},
+   {d:9,p:{product:'Corrugated boxes',text:'5 ply corrugated boxes 12x10x8 inch, printed logo, for e-commerce shipping.',qty:100,unit:'pieces',budget:'₹2 per box',location:'Mumbai',timeline:'Within 1 month',useCase:'E-commerce shipping'},path:[['Rejected',7]],rej:{reason:'Insufficient quantity',note:'Below supplier minimum order of 500 pieces.'}},
+   {d:8,p:{product:'Cotton fabric',text:'Need 2000 meters of 40s cotton fabric, 140 GSM. Budget ₹60 per meter.',qty:2000,unit:'meters',budget:'₹60 per meter',location:'Surat',timeline:'1–3 months',useCase:'Shirting manufacturing'},path:[['Rejected',10]],rej:{reason:'Budget mismatch',note:'Typical market price for this spec is higher.'}},
+   {d:6,p:{product:'Vibrating screen',text:'Need a vibrating screen for 100 TPH aggregate plant, 20 mm and 10 mm output. Plant is in Raipur. Need quote this week.',qty:'',unit:'',budget:'',location:'',timeline:'',useCase:''},path:[],ans:[['quantity','1 unit'],['use_case','Aggregate plant screening']]},
+   {d:5,p:{product:'Centrifugal pump',text:'Need 10 centrifugal pumps, 5 HP, 3 phase for irrigation. Delivery to Indore in 3 weeks.',qty:10,unit:'units',budget:'',location:'Indore',timeline:'Within 1 month',useCase:''},path:[],fix:[['specs','5 HP, 3 phase, 50 m head']]},
+   {d:4,p:{product:'Machine',text:'Need a machine for my factory, please quote best price.',qty:'',unit:'',budget:'',location:'',timeline:'',useCase:''},path:[]},
+   {d:3,p:{product:'Solar panels',text:'Looking for 5 kW rooftop solar system with mono perc panels for our factory in Surat.',qty:5,unit:'units',budget:'',location:'Chennai',timeline:'1–3 months',useCase:''},path:[]},
+   {d:2,p:{product:'Jaw crusher',text:'Need jaw crusher 40x30 inch with 150 TPH capacity. Quantity 5 units. We need it for a road project in Lucknow.',qty:50,unit:'units',budget:'',location:'Lucknow',timeline:'',useCase:''},path:[]},
+   {d:1,p:{product:'Steel pipes',text:'ERW MS pipe 2 inch, 500 meters, for water supply.',qty:500,unit:'meters',budget:'',location:'Bengaluru',timeline:'Immediate (within 1 week)',useCase:''},path:[],keepNew:true},
+   {d:0.2,p:{product:'Solar inverter',text:'Looking for a 10 kW solar inverter, on-grid, for office building in Ahmedabad. Quantity 2 units.',qty:2,unit:'units',budget:'',location:'Ahmedabad',timeline:'Within 1 month',useCase:''},path:[],keepNew:true}
+  ];
+  S.forEach(x=>{
+    const at=now-x.d*D,enq=createEnquiry(x.p,{createdAt:at,keepNew:x.keepNew});
+    (x.fix||[]).forEach((f,i)=>setField(enq,f[0],f[1],at+2*H));
+    if(x.fix)enq.result=qualify(enq);
+    if(x.ans){x.ans.forEach(a=>applyAnswer(enq,{id:a[0]+':missing',field:a[0],question:QDEF[a[0]][0]},a[1],at+5*H));afterChange(enq,at+5*H);}
+    x.path.forEach(st=>{hist(enq,st[0],'seller',st[0]==='Rejected'?'Rejected after human review':'Updated by seller',at+st[1]*H);});
+    if(x.rej)enq.rejection={reason:x.rej.reason,note:x.rej.note,reviewed:true,at:at+x.path[0][1]*H};
+  });
+  save();
+}
+
+/* ================= metrics ================= */
+const DECIDED=['Accepted','Quotation sent','Converted','Rejected'],ACCEPTED=['Accepted','Quotation sent','Converted'];
+function metrics(){
+  const E=state.enquiries,n=E.length;
+  const complete=E.filter(e=>e.result.missing_fields.length===0).length;
+  const q=E.filter(e=>e.result.qualification_status==='qualified').length;
+  const awaiting=E.filter(e=>e.status==='Awaiting clarification').length;
+  const hq=E.filter(e=>e.hadQuestions),hqDone=hq.filter(e=>e.answers.length&&e.result.missing_fields.length===0&&e.result.detected_mismatches.length===0).length;
+  const decided=E.filter(e=>DECIDED.includes(e.status)),acc=E.filter(e=>ACCEPTED.includes(e.status)).length;
+  const quo=E.filter(e=>['Quotation sent','Converted'].includes(e.status)).length;
+  const resp=[];E.forEach(e=>{const h=e.history.find(x=>x.actor==='seller');if(h)resp.push((h.at-e.createdAt)/3600e3);});
+  const ai=E.reduce((s,e)=>s+(e.aiExtracted||0),0),corr=E.reduce((s,e)=>s+e.corrections.filter(c=>c.fromSource==='text').length,0);
+  return{n,complete,incomplete:n-complete,awaiting,q,hq:hq.length,hqDone,decided:decided.length,acc,quo,
+    completeness:pct(complete,n),clar:pct(hqDone,hq.length),acceptance:pct(acc,decided.length),conv:pct(quo,n),
+    ttr:resp.length?resp.reduce((a,b)=>a+b,0)/resp.length:null,corrRate:pct(corr,ai),corr,ai,respN:resp.length};
+}
+
+/* ================= UI ================= */
+const ui={view:'overview',sel:null,f:{q:'',tab:'all',sort:'date_desc'}};
+const VIEWS=[['overview','Overview'],['submit','New enquiry'],['inbox','Inbox']];
+const SC={'New':'info','Awaiting clarification':'warn','Ready for review':'ok','Accepted':'ok','Quotation sent':'ok','Converted':'ok','Rejected':'bad'};
+const QC={qualified:['Ready','ok'],needs_clarification:['Needs details','warn'],insufficient_information:['Too vague','bad']};
+const SHORT={product:'product',quantity:'quantity',unit:'unit',location:'location',timeline:'timeline',specs:'specs',use_case:'use'};
+const chipS=s=>'<span class="chip '+(SC[s]||'')+'">'+esc(s)+'</span>';
+const chipQ=s=>'<span class="chip '+QC[s][1]+'">'+QC[s][0]+'</span>';
+const byId=id=>state.enquiries.find(e=>e.id===id);
+function toast(msg,err){const t=$('#toast');t.innerHTML='<div class="toast'+(err?' err':'')+'" role="status">'+esc(msg)+'</div>';clearTimeout(toast.t);toast.t=setTimeout(()=>{t.innerHTML='';},3200);}
+function go(v,id){ui.view=v;if(id)ui.sel=id;$('#modal').innerHTML='';render();window.scrollTo({top:0});}
+function render(){
+  $('#nav').innerHTML=VIEWS.map(v=>'<button data-act="nav" data-v="'+v[0]+'"'+((ui.view===v[0]||(ui.view==='enquiry'&&v[0]==='inbox'))?' aria-current="page"':'')+'>'+v[1]+'</button>').join('');
+  $('#app').innerHTML=({overview:viewOverview,submit:viewSubmit,inbox:viewInbox,enquiry:viewEnquiry})[ui.view]();
+  if(ui.view==='inbox')updateInbox();
+}
+const emptyAll='<div class="card empty"><h3>No enquiries yet</h3><p>Add the first one to get started.</p><p style="margin-top:12px"><button class="btn primary" data-act="nav" data-v="submit">New enquiry</button></p></div>';
+const need=e=>e.result.missing_fields.map(m=>SHORT[m.field]||m.field).concat(e.result.detected_mismatches.map(m=>m.field+' conflict'));
+const wants=e=>esc(e.ext.product.value||'Not stated')+'<div class="small muted">'+(e.ext.quantity.value?esc(e.ext.quantity.value+' '+(e.ext.unit.value||'')):'quantity missing')+(e.ext.location.value?' · '+esc(e.ext.location.value):'')+'</div>';
+
+/* ---- Overview ---- */
+function stat(l,v,t){return '<div class="stat '+(t||'')+'"><b>'+v+'</b><span>'+l+'</span></div>';}
+function viewOverview(){
+  const m=metrics();if(!m.n)return emptyAll;
+  const cats={};state.enquiries.forEach(e=>{const c=e.result.category||'none';cats[c]=cats[c]||{q:0,n:0,i:0};cats[c][e.result.qualification_status==='qualified'?'q':e.result.qualification_status==='needs_clarification'?'n':'i']++;});
+  const rows=Object.keys(cats).map(k=>({l:k==='none'?'Uncategorised':catLabel(k),c:cats[k],t:cats[k].q+cats[k].n+cats[k].i})).sort((a,b)=>b.t-a.t),mx=Math.max.apply(null,rows.map(r=>r.t));
+  const chart=rows.map(r=>'<div class="bar-row"><span>'+esc(r.l)+'</span><div class="bar" style="width:'+(r.t/mx*100)+'%" role="img" aria-label="'+esc(r.l)+': '+r.c.q+' ready, '+r.c.n+' need details, '+r.c.i+' too vague"><i class="seg-q" style="width:'+pct(r.c.q,r.t)+'%"></i><i class="seg-n" style="width:'+pct(r.c.n,r.t)+'%"></i><i class="seg-i" style="width:'+pct(r.c.i,r.t)+'%"></i></div><b>'+r.t+'</b></div>').join('');
+  const todo=state.enquiries.filter(e=>['New','Awaiting clarification','Ready for review'].includes(e.status)).sort((a,b)=>b.createdAt-a.createdAt).slice(0,5);
+  const ttr=m.ttr==null?'No response yet':(m.ttr<48?m.ttr.toFixed(1)+' hours':(m.ttr/24).toFixed(1)+' days');
+  const T=[['Completeness rate',m.completeness+'%','70% or more','Enquiries with every required detail ÷ all enquiries'],['Clarification completion',m.clar+'%','60% or more','Buyer answered and gaps closed ÷ enquiries that needed questions ('+m.hqDone+' of '+m.hq+')'],['Seller acceptance',m.acceptance+'%','55% or more','Accepted, quoted or converted ÷ decided enquiries ('+m.acc+' of '+m.decided+')'],['Time to first response',ttr,'8 hours or less','Average time to a seller\'s first action ('+m.respN+' enquiries)'],['Enquiry to quotation',m.conv+'%','25% or more','Quotation sent or converted ÷ all enquiries ('+m.quo+' of '+m.n+')'],['AI correction rate',m.corrRate+'%','15% or less','Auto-extracted fields a person corrected ÷ fields extracted ('+m.corr+' of '+m.ai+')']];
+  return '<div class="page-head"><div><h1>Overview</h1><p>How enquiries are doing. Updates whenever something changes.</p></div><button class="btn primary" data-act="nav" data-v="submit">New enquiry</button></div>'+
+  '<div class="stats">'+stat('Enquiries received',m.n)+stat('Complete',m.complete,'g')+stat('Incomplete',m.incomplete,'w')+stat('Waiting for buyer',m.awaiting,'w')+stat('Qualified',m.q,'g')+stat('Seller acceptance',m.acceptance+'%')+stat('Became a quotation',m.conv+'%')+'</div>'+
+  '<section class="card"><h2>Needs your attention</h2>'+(todo.length?'<div style="margin-top:8px">'+todo.map(e=>'<div class="todo"><div><b>'+e.id+'</b> '+esc(e.ext.product.value||'Not stated')+'<div class="small muted">'+(need(e).length?'Missing: '+esc(need(e).join(', ')):'Nothing missing')+'</div></div><div>'+chipS(e.status)+' <button class="btn sm" data-act="open" data-id="'+e.id+'">Open</button></div></div>').join('')+'</div>':'<p class="muted" style="margin-top:6px">Nothing waiting. Nice.</p>')+'</section>'+
+  '<section class="card"><h2>Quality by product category</h2><div class="chart" style="margin-top:12px">'+chart+'</div><div class="legend"><span><b class="seg-q"></b>Ready</span><span><b class="seg-n"></b>Needs details</span><span><b class="seg-i"></b>Too vague</span></div></section>'+
+  '<section class="card"><details><summary>All metrics and targets</summary><p class="note" style="margin:8px 0">"Observed" comes from the synthetic demo records. "Target" is a hypothesis to test, not a result.</p><div class="tablewrap"><table class="tbl"><thead><tr><th>Metric</th><th>Observed (demo)</th><th>Target (hypothesis)</th></tr></thead><tbody>'+T.map(t=>'<tr><td>'+t[0]+'<div class="note">'+esc(t[3])+'</div></td><td><b>'+esc(t[1])+'</b></td><td>'+t[2]+'</td></tr>').join('')+'</tbody></table></div></details></section>'+
+  '<p class="note" style="text-align:center;margin-top:18px"><button class="linkbtn" data-act="reset">Reset demo data</button></p>';
+}
+
+/* ---- New enquiry ---- */
+const EXAMPLES=[
+ {product:'Jaw crusher',text:'We need a 150 TPH jaw crusher for a basalt quarry near Jaipur. Quantity 2 units, wanted within 2 months.',qty:2,unit:'units',budget:'₹30 lakh',location:'Jaipur',timeline:'1–3 months',useCase:'Basalt quarry crushing'},
+ {product:'Steel pipes',text:'Need 20 tons of ERW MS pipe, 3 inch, for a water supply project. Delivery to Chennai.',qty:5,unit:'tons',budget:'',location:'Chennai',timeline:'',useCase:''},
+ {product:'Machine',text:'Looking for a good machine for my factory.',qty:'',unit:'',budget:'',location:'',timeline:'',useCase:''}
+];
+function viewSubmit(){
+  const opt=a=>a.map(x=>'<option>'+esc(x)+'</option>').join('');
+  return '<div class="page-head"><div><h1>New enquiry</h1><p>Tell us what you need. We\'ll check it and ask for anything that\'s missing.</p></div></div>'+
+  '<form id="enqForm" class="card narrow" novalidate>'+
+  '<div class="field"><label for="f-product">What do you need?</label><input type="text" id="f-product" maxlength="120" placeholder="For example: jaw crusher, TMT bars, corrugated boxes"></div>'+
+  '<div class="field"><label for="f-text">Describe it</label><textarea id="f-text" maxlength="2000" placeholder="Size, capacity, quantity, where it is going, when you need it"></textarea></div>'+
+  '<details class="more"><summary>Add more details (optional)</summary><div style="margin-top:12px"><div class="row3"><div class="field"><label for="f-qty">Quantity</label><input type="number" id="f-qty" min="0" step="any" inputmode="decimal"></div><div class="field"><label for="f-unit">Unit</label><select id="f-unit"><option value="">Select</option>'+opt(UNIT_OPTS)+'</select></div><div class="field"><label for="f-budget">Budget</label><input type="text" id="f-budget" maxlength="60" placeholder="₹5–8 lakh"></div></div>'+
+  '<div class="row2"><div class="field"><label for="f-location">Delivery location</label><input type="text" id="f-location" maxlength="80" placeholder="City or state"></div><div class="field"><label for="f-timeline">When do you need it?</label><select id="f-timeline"><option value="">Select</option>'+opt(['Immediate (within 1 week)','Within 1 month','1–3 months','3+ months','Just exploring'])+'</select></div></div>'+
+  '<div class="field"><label for="f-use">What is it for?</label><input type="text" id="f-use" maxlength="120" placeholder="For example: aggregate production, resale"></div>'+
+  '<div class="field"><label style="display:flex;gap:8px;align-items:flex-start;font-weight:500"><input type="checkbox" id="f-consent" style="margin-top:4px"><span>Share my contact details with sellers</span></label></div>'+
+  '<div id="contactFields" hidden><div class="row3"><div class="field"><label for="c-name">Name</label><input type="text" id="c-name" maxlength="80"></div><div class="field"><label for="c-phone">Phone</label><input type="tel" id="c-phone" maxlength="20"></div><div class="field"><label for="c-email">Email</label><input type="email" id="c-email" maxlength="100"></div></div></div></div></details>'+
+  '<div id="formErr" class="note" style="color:var(--bad);margin:10px 0" role="alert"></div>'+
+  '<button class="btn primary big" id="submitBtn" type="submit">Check my enquiry</button>'+
+  '<p class="note" style="margin-top:14px">Try an example: <button type="button" class="linkbtn" data-act="example" data-i="0">complete</button>, <button type="button" class="linkbtn" data-act="example" data-i="1">details disagree</button>, <button type="button" class="linkbtn" data-act="example" data-i="2">too vague</button></p></form>';
+}
+function submitEnquiry(){
+  const g=id=>$('#'+id).value,err=$('#formErr');
+  const raw={product:g('f-product'),text:g('f-text'),qty:g('f-qty'),unit:g('f-unit'),budget:g('f-budget'),location:g('f-location'),timeline:g('f-timeline'),useCase:g('f-use'),consent:$('#f-consent').checked,contact:{name:g('c-name'),phone:g('c-phone'),email:g('c-email')}};
+  if(!clean(raw.product)&&clean(raw.text).length<10){err.textContent='Tell us what you need, even in a few words.';return;}
+  if(raw.consent&&raw.contact.email&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(raw.contact.email)){err.textContent='That email address does not look right.';return;}
+  if(raw.qty!==''&&(isNaN(num(raw.qty))||num(raw.qty)<0)){err.textContent='Quantity must be a positive number.';return;}
+  err.textContent='';
+  const b=$('#submitBtn');b.disabled=true;b.innerHTML='<span class="spin"></span> Checking';
+  setTimeout(async()=>{
+    try{const enq=createEnquiry(raw);if(AI_ENDPOINT)await runEngine(enq);save();go('enquiry',enq.id);toast('Enquiry '+enq.id+' checked');}
+    catch(ex){b.disabled=false;b.textContent='Check my enquiry';err.textContent='Something went wrong: '+ex.message+'. Your input is still here, try again.';}
+  },600);
+}
+
+/* ---- Inbox ---- */
+const TABS=[['all','All'],['needs','Needs details'],['ready','Ready for review'],['done','Done']];
+const tabOf=e=>e.status==='Awaiting clarification'?'needs':(e.status==='Ready for review'||e.status==='New')?'ready':'done';
+function viewInbox(){
+  if(!state.enquiries.length)return emptyAll;
+  const f=ui.f,cnt=t=>state.enquiries.filter(e=>t==='all'||tabOf(e)===t).length;
+  return '<div class="page-head"><div><h1>Inbox</h1><p>Pick an enquiry to review it.</p></div></div>'+
+  '<div class="tabs2" role="tablist">'+TABS.map(t=>'<button role="tab" aria-selected="'+(f.tab===t[0])+'" data-act="tab" data-t="'+t[0]+'">'+t[1]+' <span>'+cnt(t[0])+'</span></button>').join('')+'</div>'+
+  '<div class="toolbar"><input type="text" id="f-q" data-filter="q" placeholder="Search by ID, product or place" value="'+esc(f.q)+'" aria-label="Search enquiries"><select data-filter="sort" aria-label="Sort"><option value="date_desc"'+(f.sort==='date_desc'?' selected':'')+'>Newest first</option><option value="date_asc"'+(f.sort==='date_asc'?' selected':'')+'>Oldest first</option><option value="qual"'+(f.sort==='qual'?' selected':'')+'>Most complete first</option></select></div>'+
+  '<div class="tablewrap"><table class="tbl"><thead><tr><th>Enquiry</th><th>What they need</th><th>Missing</th><th>Status</th></tr></thead><tbody id="inboxBody"></tbody></table></div>';
+}
+function updateInbox(){
+  const f=ui.f,q=f.q.toLowerCase(),qo={qualified:0,needs_clarification:1,insufficient_information:2};
+  const L=state.enquiries.filter(e=>(f.tab==='all'||tabOf(e)===f.tab)&&(!q||(e.id+' '+(e.ext.product.value||'')+' '+e.raw.text+' '+(e.ext.location.value||'')).toLowerCase().indexOf(q)>-1))
+   .sort((a,b)=>f.sort==='date_asc'?a.createdAt-b.createdAt:f.sort==='qual'?qo[a.result.qualification_status]-qo[b.result.qualification_status]:b.createdAt-a.createdAt);
+  $('#inboxBody').innerHTML=L.length?L.map(e=>{const n=need(e);return '<tr class="row" data-act="open" data-id="'+e.id+'"><td><button class="idbtn" data-act="open" data-id="'+e.id+'">'+e.id+'</button><div class="small muted">'+fmtDate(e.createdAt)+'</div></td><td>'+wants(e)+'</td><td>'+(n.length?'<div class="chips">'+n.map(x=>'<span class="chip warn">'+esc(x)+'</span>').join('')+'</div>':'<span class="chip ok">Complete</span>')+'</td><td>'+chipS(e.status)+'</td></tr>';}).join(''):'<tr><td colspan="4"><div class="empty"><h3>Nothing here</h3><p>Try another tab or clear the search.</p></div></td></tr>';
+}
+
+/* ---- One page per enquiry: check, fix, answer, decide ---- */
+function viewEnquiry(){
+  const e=byId(ui.sel);
+  if(!e)return '<div class="card empty"><h3>Enquiry not found</h3><button class="btn primary" data-act="nav" data-v="inbox">Back to inbox</button></div>';
+  const r=e.result,st=r.qualification_status,qs=r.clarification_questions;
+  const H={qualified:['Ready to send to sellers','ok','Everything sellers need is here.'],needs_clarification:['A few details are missing','warn','Answer the questions below to complete it.'],insufficient_information:['Too vague to send yet','bad','Use the questions below to find out what the buyer needs.']}[st];
+  const fld=f=>{const x=e.ext[f];let tag='';
+    if(REQUIRED.includes(f)&&x.value==null)tag='<span class="chip warn">Missing</span>';
+    else if(x.value!=null&&x.confidence<.7)tag='<span class="chip info">Please check</span>';
+    const inp=f==='unit'?'<select id="fld-unit"><option value="">Not set</option>'+UNIT_OPTS.map(u=>'<option'+(x.value===u?' selected':'')+'>'+u+'</option>').join('')+'</select>':'<input type="'+(f==='quantity'?'number':'text')+'" id="fld-'+f+'" value="'+esc(x.value==null?'':x.value)+'"'+(f==='quantity'?' min="0" step="any"':' maxlength="200"')+'>';
+    return '<div class="field"><label for="fld-'+f+'">'+LABEL[f]+' '+tag+'</label>'+inp+(x.value!=null?'<span class="hint">Confidence '+Math.round(x.confidence*100)+'%</span>':'')+'</div>';};
+  const qHtml=qs.length?qs.map(q=>{const k='ans-'+q.id.replace(':','-');return '<div class="q"><label for="'+k+'"><b>'+esc(q.question)+'</b></label><div class="why">Why we ask: '+esc(q.why)+'</div><div style="margin-top:8px">'+(q.kind==='mismatch'?q.options.map((op,i)=>'<label style="display:block;margin:3px 0"><input type="radio" name="'+k+'" value="'+esc(op)+'"> '+esc(op)+(i===0?' (form)':' (description)')+'</label>').join(''):'<input type="text" id="'+k+'" maxlength="200">')+'</div></div>';}).join('')+'<button class="btn green" data-act="answers" data-id="'+e.id+'">Save answers</button>':'<p class="muted">No questions left.</p>';
+  const sup=r.supplier_matches.length?r.supplier_matches.map(s=>'<div class="match"><div><b>'+esc(s.supplier)+'</b><details><summary class="small muted">Why this score</summary><ul class="small" style="margin:6px 0 0;padding-left:18px">'+s.reasons.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></details></div><span class="chip '+(s.score>=80?'ok':'info')+'">'+s.score+'%</span></div>').join(''):'<p class="muted">No match yet. Add the product details first.</p>';
+  const cmp=FIELDS.map(f=>{const b=e.original[f],a=e.ext[f].value==null?'':String(e.ext[f].value),ch=b!==a;return '<tr class="'+(ch?'diff':'')+'"><td>'+LABEL[f].replace(' (optional)','')+'</td><td>'+(b?esc(b):'<span class="muted">Empty</span>')+'</td><td>'+(a?esc(a):'<span class="muted">Empty</span>')+'</td></tr>';}).join('');
+  const mode=r.engine_mode==='llm'?'Checked by an AI model.':r.engine_mode==='rule_based_fallback'?'AI service unavailable, so simple rules were used instead.':'Checked with simple rules (demo mode, no AI service connected).';
+  return '<button class="linkbtn" data-act="nav" data-v="inbox">← Back to inbox</button>'+
+  '<div class="page-head" style="margin-top:8px"><div><h1>'+esc(e.ext.product.value||'Enquiry')+' <span class="muted" style="font-weight:500;font-size:1rem">'+e.id+'</span></h1></div><div>'+chipS(e.status)+'</div></div>'+
+  '<div class="status-banner '+H[1]+'"><div><h2>'+H[0]+'</h2><p>'+H[2]+'</p><p class="note" style="margin-top:4px">'+mode+(r.fallback_reason?' ('+esc(r.fallback_reason)+')':'')+'</p></div></div>'+
+  '<div class="grid two"><div>'+
+  '<section class="card"><h2>What the buyer wrote</h2><p style="margin-top:6px;white-space:pre-wrap">'+esc(e.raw.text||'No description given.')+'</p>'+(e.flagged?'<p class="chip warn" style="margin-top:8px">Instruction-like text was found and ignored</p>':'')+'<p class="note" style="margin-top:10px"><b>Summary for sellers:</b> '+esc(r.seller_summary)+'</p></section>'+
+  '<section class="card"><h2>What we understood</h2><p class="note" style="margin:4px 0 12px">Fix anything that is wrong, then save.</p><div class="fgrid">'+FIELDS.map(fld).join('')+'</div><button class="btn primary" data-act="saveFields" data-id="'+e.id+'">Save changes</button></section></div>'+
+  '<div><section class="card"><h2>Questions for the buyer</h2><p class="note" style="margin:4px 0 12px">Up to three at a time.</p>'+qHtml+'</section>'+
+  '<section class="card"><h2>Suggested suppliers</h2>'+sup+'<p class="note" style="margin-top:8px">Sample catalogue. Score: category 50, product terms 15, region 20, minimum order 15.</p></section>'+
+  '<section class="card"><h2>Your decision</h2><p class="note" style="margin:4px 0 12px">Only a person can accept or reject. Missing details are never a reason to treat a buyer as suspicious.</p>'+(e.rejection?'<p style="margin-bottom:10px"><span class="chip bad">Rejected: '+esc(e.rejection.reason)+'</span> '+esc(e.rejection.note||'')+'</p>':'')+
+  '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button class="btn green" data-act="status" data-id="'+e.id+'" data-s="Accepted"'+(e.status==='Accepted'?' disabled':'')+'>Accept</button><button class="btn danger" data-act="status" data-id="'+e.id+'" data-s="Rejected"'+(e.status==='Rejected'?' disabled':'')+'>Reject</button></div>'+
+  '<label class="lab" for="setst">Other status</label><select id="setst" data-change="setstatus" data-id="'+e.id+'"><option value="">Change status…</option>'+STATUSES.filter(s=>s!==e.status&&s!=='Accepted'&&s!=='Rejected').map(s=>'<option>'+s+'</option>').join('')+'</select></section>'+
+  '<section class="card"><details><summary>Before and after</summary><div class="tablewrap" style="margin-top:10px"><table class="tbl cmp"><thead><tr><th>Field</th><th>First read</th><th>Now</th></tr></thead><tbody>'+cmp+'</tbody></table></div></details><details style="margin-top:10px"><summary>History</summary><ul class="tl" style="margin-top:10px">'+e.history.slice().reverse().map(h=>'<li><b>'+esc(h.to)+'</b> <span class="muted">by '+h.actor+', '+fmtDT(h.at)+'</span>'+(h.note?'<br>'+esc(h.note):'')+'</li>').join('')+'</ul></details><details style="margin-top:10px"><summary>Technical output (JSON)</summary><pre class="json" tabindex="0" style="margin-top:10px">'+esc(JSON.stringify(jsonOut(r),null,2))+'</pre></details></section></div></div>';
+}
+function jsonOut(r){return{extracted_requirements:r.extracted_requirements,missing_fields:r.missing_fields,clarification_questions:r.clarification_questions,detected_mismatches:r.detected_mismatches,qualification_status:r.qualification_status,qualification_reasons:r.qualification_reasons,suggested_next_action:r.suggested_next_action,supplier_matches:r.supplier_matches};}
+
+/* ---- decisions need a human ---- */
+function requestStatus(id,s){
+  const e=byId(id);if(!e||e.status===s)return;
+  if(s==='Rejected'||s==='Accepted'){
+    $('#modal').innerHTML='<div class="modal-wrap" data-act="closeModal"><div class="modal" role="dialog" aria-modal="true" aria-label="Confirm decision" data-stop="1"><h2>'+(s==='Rejected'?'Reject '+e.id+'?':'Accept '+e.id+'?')+'</h2><p class="note" style="margin:6px 0 12px">'+esc(e.result.seller_summary)+'</p>'+
+    (s==='Rejected'?'<div class="field"><label for="m-reason">Reason</label><select id="m-reason">'+REJECT_REASONS.map(x=>'<option>'+x+'</option>').join('')+'</select></div><div class="field"><label for="m-note">Note <span class="muted" id="m-req"></span></label><input type="text" id="m-note" maxlength="160" placeholder="Optional"></div>':'')+
+    '<label style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px"><input type="checkbox" id="m-ok" style="margin-top:4px"><span>I have reviewed this enquiry myself.</span></label><div id="m-err" class="note" style="color:var(--bad);min-height:18px" role="alert"></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" data-act="closeModal">Cancel</button><button class="btn '+(s==='Rejected'?'danger':'green')+'" data-act="confirmStatus" data-id="'+id+'" data-s="'+s+'">'+(s==='Rejected'?'Reject':'Accept')+'</button></div></div></div>';
+    const sel=$('#m-reason');if(sel)sel.addEventListener('change',()=>{$('#m-req').textContent=sel.value==='Other'?'(required)':'';});
+    return;
+  }
+  commitStatus(id,s);
+}
+function commitStatus(id,s,extra){
+  const e=byId(id);hist(e,s,'seller',(extra&&extra.note)||'Updated by seller');
+  if(extra&&extra.rejection)e.rejection=extra.rejection;else if(s!=='Rejected')e.rejection=null;
+  save();toast(e.id+' is now: '+s);render();
+}
+
+/* ================= events ================= */
+document.addEventListener('click',ev=>{
+  const el=ev.target.closest('[data-act]');if(!el)return;
+  const stop=ev.target.closest('[data-stop]');
+  if(stop&&el!==stop&&el.dataset.act==='closeModal'&&el.contains(stop))return;
+  const a=el.dataset.act,id=el.dataset.id;
+  if(a==='nav')go(el.dataset.v);
+  else if(a==='open')go('enquiry',id);
+  else if(a==='tab'){ui.f.tab=el.dataset.t;render();}
+  else if(a==='closeModal')$('#modal').innerHTML='';
+  else if(a==='status')requestStatus(id,el.dataset.s);
+  else if(a==='reset'){if(confirm('Reset to the original demo data? Your enquiries and changes will be removed.')){seed();ui.sel=null;go('overview');toast('Demo data reset');}}
+  else if(a==='confirmStatus'){
+    const s=el.dataset.s;if(!$('#m-ok').checked){$('#m-err').textContent='Please tick the box to confirm.';return;}
+    if(s==='Rejected'){const reason=$('#m-reason').value,note=clean($('#m-note').value,160);if(reason==='Other'&&!note){$('#m-err').textContent='Add a short note for "Other".';return;}
+      $('#modal').innerHTML='';commitStatus(id,s,{note:'Rejected after human review: '+reason,rejection:{reason,note,reviewed:true,at:Date.now()}});}
+    else{$('#modal').innerHTML='';commitStatus(id,s,{note:'Accepted after human review'});}
+  }
+  else if(a==='example'){const x=EXAMPLES[+el.dataset.i];$('#f-product').value=x.product;$('#f-text').value=x.text;$('#f-qty').value=x.qty;$('#f-unit').value=x.unit;$('#f-budget').value=x.budget;$('#f-location').value=x.location;$('#f-timeline').value=x.timeline;$('#f-use').value=x.useCase;if(x.qty||x.location)document.querySelector('details.more').open=true;toast('Example filled in. Press "Check my enquiry".');}
+  else if(a==='saveFields'){
+    const e=byId(id);let n=0;FIELDS.forEach(f=>{const inp=$('#fld-'+f);if(inp&&setField(e,f,inp.value))n++;});
+    if(!n){toast('Nothing changed');return;}
+    afterChange(e);save();render();toast('Saved. Enquiry re-checked.');
+  }
+  else if(a==='answers'){
+    const e=byId(id);let n=0;
+    e.result.clarification_questions.forEach(q=>{const k='ans-'+q.id.replace(':','-');let v='';if(q.kind==='mismatch'){const r=document.querySelector('input[name="'+k+'"]:checked');v=r?r.value:'';}else{const i=$('#'+k);v=i?i.value:'';}
+      if(v&&applyAnswer(e,q,v))n++;});
+    if(!n){toast('Type an answer first',true);return;}
+    afterChange(e);save();render();toast('Answers saved. Enquiry updated.');
+  }
+});
+document.addEventListener('submit',ev=>{if(ev.target.id==='enqForm'){ev.preventDefault();submitEnquiry();}});
+document.addEventListener('input',ev=>{const t=ev.target;if(t.dataset.filter==='q'){ui.f.q=t.value;updateInbox();}});
+document.addEventListener('change',ev=>{
+  const t=ev.target;
+  if(t.dataset.filter==='sort'){ui.f.sort=t.value;updateInbox();}
+  else if(t.dataset.change==='setstatus'){const v=t.value;t.value='';if(v)requestStatus(t.dataset.id,v);}
+  else if(t.id==='f-consent'){$('#contactFields').hidden=!t.checked;}
+});
+document.addEventListener('keydown',ev=>{if(ev.key==='Escape')$('#modal').innerHTML='';});
+
+/* ================= boot ================= */
+try{state=load();if(!state)seed();}catch(e){seed();}
+render();
+})();
+</script>
+</body>
+</html>
